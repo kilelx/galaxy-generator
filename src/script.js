@@ -20,6 +20,9 @@ const scene = new THREE.Scene()
 const parameters = {};
 parameters.count = 10000;
 parameters.size = 0.01;
+parameters.radius = 5;
+parameters.branches = 3;
+parameters.spin = 1;
 
 let geometry = null;
 let material = null;
@@ -44,9 +47,32 @@ const generateGalaxy = () => {
     for (let i=0; i<parameters.count; i++) {
         const i3 = i*3;
 
-        positions[i3] = (Math.random() - 0.5) * 10;
-        positions[i3 + 1] = (Math.random() - 0.5) * 10;
-        positions[i3 + 2] = (Math.random() - 0.5) * 10;
+        // Position the particles on a straight line
+        const radius = Math.random() * parameters.radius;
+
+        /*
+            We multiply the radius by the spin
+            The further away from the center si the particle, the more spin we want
+        */
+        const spinAngle = radius * parameters.spin;
+
+        /*
+            Calculate branch's angle
+            To get the branch's number
+            To get the percentage of the angle (e.g. 0, 0.33, 0.66), we divide by the number of branches
+            To get the PI value, me multiply by PI and by 2
+        */
+        const branchAngle = (i % parameters.branches) / parameters.branches * Math.PI * 2;
+
+        // log the 20st values
+        if(i < 20) {
+            console.log('i: ' + i % parameters.branches, ' branchAngle: ' + branchAngle);
+        }
+
+        // We add the spinAngle to the branchAngle
+        positions[i3] = Math.cos(branchAngle + spinAngle) * radius;
+        positions[i3 + 1] = 0;
+        positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius;
     }
 
     geometry.setAttribute(
@@ -71,6 +97,9 @@ generateGalaxy();
 
 gui.add(parameters, 'count', 100, 100000, 100).onFinishChange(generateGalaxy);
 gui.add(parameters, 'size').min(0.001).max(0.1).step(0.001).onFinishChange(generateGalaxy);
+gui.add(parameters, 'radius').min(0.1).max(15).step(0.1).onFinishChange(generateGalaxy);
+gui.add(parameters, 'branches').min(2).max(20).step(1).onFinishChange(generateGalaxy);
+gui.add(parameters, 'spin').min(-5).max(5).step(0.05).onFinishChange(generateGalaxy);
 
 /**
  * Sizes
