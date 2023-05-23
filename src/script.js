@@ -18,12 +18,15 @@ const scene = new THREE.Scene()
  * Galaxy
  */
 const parameters = {};
-parameters.count = 10000;
+parameters.count = 100000;
 parameters.size = 0.01;
 parameters.radius = 5;
 parameters.branches = 3;
 parameters.spin = 1;
-parameters.randomness = 0.2
+parameters.randomness = 0.2;
+parameters.randomnessPower = 3;
+parameters.insideColor = '#ff6030';
+parameters.outsideColor = '#1b3984';
 
 let geometry = null;
 let material = null;
@@ -57,7 +60,7 @@ const generateGalaxy = () => {
         */
         const spinAngle = radius * parameters.spin;
 
-        /*
+        /*npm
             Calculate branch's angle
             To get the branch's number
             To get the percentage of the angle (e.g. 0, 0.33, 0.66), we divide by the number of branches
@@ -65,9 +68,9 @@ const generateGalaxy = () => {
         */
         const branchAngle = (i % parameters.branches) / parameters.branches * Math.PI * 2;
 
-        const randomX = (Math.random() - 0.5) * parameters.randomness;
-        const randomY = (Math.random() - 0.5) * parameters.randomness;
-        const randomZ = (Math.random() - 0.5) * parameters.randomness;
+        const randomX = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1);
+        const randomY = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1);
+        const randomZ = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1);
 
         // We add the spinAngle to the branchAngle
         positions[i3] = Math.cos(branchAngle + spinAngle) * radius + randomX;
@@ -101,6 +104,9 @@ gui.add(parameters, 'radius').min(0.1).max(15).step(0.1).onFinishChange(generate
 gui.add(parameters, 'branches').min(2).max(20).step(1).onFinishChange(generateGalaxy);
 gui.add(parameters, 'spin').min(-5).max(5).step(0.05).onFinishChange(generateGalaxy);
 gui.add(parameters, 'randomness').min(0).max(2).step(0.01).onFinishChange(generateGalaxy);
+gui.add(parameters, 'randomnessPower').min(1).max(10).step(0.1).onFinishChange(generateGalaxy);
+gui.addColor(parameters, 'insideColor').onFinishChange(generateGalaxy);
+gui.addColor(parameters, 'outsideColor').onFinishChange(generateGalaxy);
 
 /**
  * Sizes
