@@ -49,6 +49,9 @@ const generateGalaxy = () => {
     const positions = new Float32Array(parameters.count * 3);
     const colors = new Float32Array(parameters.count * 3);
 
+    const colorInside = new THREE.Color(parameters.insideColor);
+    const colorOutside = new THREE.Color(parameters.outsideColor);
+
     for (let i=0; i<parameters.count; i++) {
         const i3 = i*3;
 
@@ -72,9 +75,9 @@ const generateGalaxy = () => {
         */
         const branchAngle = (i % parameters.branches) / parameters.branches * Math.PI * 2;
 
-        const randomX = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1);
-        const randomY = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1);
-        const randomZ = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1);
+        const randomX = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+        const randomY = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
+        const randomZ = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius;
 
         // We add the spinAngle to the branchAngle
         positions[i3] = Math.cos(branchAngle + spinAngle) * radius + randomX;
@@ -83,10 +86,13 @@ const generateGalaxy = () => {
         /**
          * Color
          */
-        // Three values : Red, Green, Blue
-        colors[i3] = 1;
-        colors[i3 + 1] = 0;
-        colors[i3 + 2] = 0;
+
+        const mixedColor = colorInside.clone();
+        mixedColor.lerp(colorOutside, radius / parameters.radius);
+
+        colors[i3] = mixedColor.r;
+        colors[i3 + 1] = mixedColor.g;
+        colors[i3 + 2] = mixedColor.b;
     }
 
     geometry.setAttribute(
