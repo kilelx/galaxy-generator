@@ -139,6 +139,8 @@ const sizes = {
     height: window.innerHeight
 }
 
+console.log(5%3);
+
 window.addEventListener('resize', () =>
 {
     // Update sizes
